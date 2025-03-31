@@ -19,3 +19,13 @@ contacts_api/
 pip install fastapi sqlalchemy psycopg2 pydantic uvicorn
 ```
 
+## Run
+```
+uvicorn app.main:app --reload
+```
+
+## Usage
+```
+http://127.0.0.1:8000/docs 
+```
+
