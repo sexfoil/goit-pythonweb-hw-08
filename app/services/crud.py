@@ -1,13 +1,16 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
-from .models import Contact
-from .schemas import ContactCreate, ContactUpdate
+from ..repository.models import Contact
+from ..repository.schemas import ContactCreate, ContactUpdate
+
 
 def get_contacts(db: Session, skip: int = 0, limit: int = 10):
     return db.query(Contact).offset(skip).limit(limit).all()
 
+
 def get_contact(db: Session, contact_id: int):
     return db.query(Contact).filter(Contact.id == contact_id).first()
+
 
 def create_contact(db: Session, contact_data: ContactCreate):
     new_contact = Contact(**contact_data.dict())
@@ -15,6 +18,7 @@ def create_contact(db: Session, contact_data: ContactCreate):
     db.commit()
     db.refresh(new_contact)
     return new_contact
+
 
 def update_contact(db: Session, contact_id: int, contact_data: ContactUpdate):
     contact = db.query(Contact).filter(Contact.id == contact_id).first()
@@ -24,17 +28,24 @@ def update_contact(db: Session, contact_id: int, contact_data: ContactUpdate):
     db.refresh(contact)
     return contact
 
+
 def delete_contact(db: Session, contact_id: int):
     contact = db.query(Contact).filter(Contact.id == contact_id).first()
     db.delete(contact)
     db.commit()
 
+
 def search_contacts(db: Session, query: str):
-    return db.query(Contact).filter(
-        (Contact.first_name.ilike(f"%{query}%")) | 
-        (Contact.last_name.ilike(f"%{query}%")) | 
-        (Contact.email.ilike(f"%{query}%"))
-    ).all()
+    return (
+        db.query(Contact)
+        .filter(
+            (Contact.first_name.ilike(f"%{query}%"))
+            | (Contact.last_name.ilike(f"%{query}%"))
+            | (Contact.email.ilike(f"%{query}%"))
+        )
+        .all()
+    )
+
 
 def get_birthdays_next_week(db: Session):
     today = datetime.now().date()
